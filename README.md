@@ -185,18 +185,7 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
         }
         LstPlanosAcao{
             Campos{
-                StatusAcao_lstPlanosAcao (caixa de texto){
-                NomeStatus: ThisItem.NomeStatus.Value
-            }
-                DtAlvo_lstPlanosAcao{
-                DtAlvo: ThisItem.DtAlvo
-            }
-                DtInicio_lstPlanosAcao{
-                DtInicio: ThisItem.DtInicio
-            }
-                txtNomeGT_lstPlanosAcao{
-                LookUp(tbl_cad_NomeAcao; NomeAcao = ThisItem.NomeAcao.Value;NomeGT.Value)
-            }
+
                 txtNomeAcao_lstPlanosAcao{
                 ThisItem.NomeAcao.Value & "          ::          " & Text(ThisItem.DtInicio; "[$-en-US]dd/mm/yyyy") & "          ::          " & Text(ThisItem.DtAlvo; "[$-en-US]dd/mm/yyyy") & "          ::          " & ThisItem.NomeStatus.Value & "          ::          " & LookUp(tbl_cad_NomeAcao; NomeAcao = ThisItem.NomeAcao.Value;NomeGT.Value)
             }
