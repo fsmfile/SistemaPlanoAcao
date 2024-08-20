@@ -178,11 +178,34 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
 
 
     Ctn_LstPlanosAcao{
-        txtLocalizaPlanoAcao{
+        CboFiltraNomeAcao{
             Default{
                 Blank()
             }
+            Items{
+                Distinct(tbl_cad_NomeAcao;ThisRecord.NomeAcao)
+            }
         }
+
+        CboFiltraNomeGT{
+            Default{
+                Blank()
+            }
+            Items{
+                Distinct(tbl_cad_GT;ThisRecord.NomeGT)
+            }
+        }
+
+        CboFiltraStatus{
+            Default{
+                Blank()
+            }
+            Items{
+                Distinct(tbl_cad_Status_planoacao;ThisRecord.NomeStatus)
+            }
+        }
+
+
         LstPlanosAcao{
             Campos{
 
@@ -193,7 +216,13 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
             }
         
         Items{
-            tbl_cad_PlanoAcao
+            Filter(
+                tbl_cad_PlanoAcao;
+                (IsBlank(CboFiltraNomeAcao.Selected.Value) || Text(NomeAcao.Value) = Text(CboFiltraNomeAcao.Selected.Value)) &&
+                (IsBlank(CboFiltraNomeGT.Selected.Value) || LookUp(tbl_cad_GT;NomeGT = CboFiltraNomeGT.Selected.Value;NomeGT)) &&
+                (IsBlank(CboFiltraStatus.Selected.Value) || Text(NomeStatus.Value) = Text(CboFiltraStatus.Selected.Value))
+            )
+
         }
             
 
