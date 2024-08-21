@@ -39,6 +39,7 @@
     [DtAlvo]: Data e hora (dd/mm/aaaa)
     [Descricao]: texto com várias linhas
     [NomeStatus]: Consulta {NomeStatus: tbl_cad_Status_planoacao}
+    [NomeGT]: Consulta {NomeGT: tbl_cad_GT}
 }
 
 [tbl_cad_GT]{
@@ -241,7 +242,7 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
 
                 txtNomeGT_lstPlanosAcao{
                     Text{
-                        LookUp(tbl_cad_NomeAcao;ThisItem.NomeAcao.Value = ThisRecord.NomeAcao;NomeGT.Value)
+                        ThisItem.NomeGT.Value
                     }
                 }
             }
@@ -249,9 +250,9 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
         Items{
             Filter(
                 tbl_cad_PlanoAcao;
-                (IsBlank(CboFiltraNomeAcao.Selected.Value) || Text(NomeAcao.Value) = Text(CboFiltraNomeAcao.Selected.Value)) &&
-                (IsBlank(CboFiltraStatus.Selected.Value) || Text(NomeStatus.Value) = Text(CboFiltraStatus.Selected.Value)) &&
-                (IsBlank(CboFiltraNomeGT.Selected.Value) || Text(NomeAcao.Value) = LookUp(tbl_cad_NomeAcao; ThisRecord.NomeGT.Value = CboFiltraNomeGT.Selected.Value;NomeAcao))
+                (IsBlank(CboFiltraNomeAcao.Selected.Value) || NomeAcao.Value = Text(CboFiltraNomeAcao.Selected.Value)) &&
+                (IsBlank(CboFiltraNomeGT.Selected.Value) || NomeGT.Value = Text(CboFiltraNomeGT.Selected.Value)) &&
+                (IsBlank(CboFiltraStatus.Selected.Value) || NomeStatus.Value = Text(CboFiltraStatus.Selected.Value))
             )
 
         }
