@@ -76,7 +76,8 @@ Dicionário{
     Header: Tipo Cabeçalho
 }
 
-[App]{}
+[App]{ 
+}
 
 
 
@@ -85,47 +86,93 @@ Dicionário{
 
     [Ctn_FormCadPlanoAcao]{
         btnNovoFormPlanoAcao{
-            // Limpa os campos
-    Reset(CboNomeAcao);;
-    Reset(SelecDtInicio_Acao);;
-    SelecDtInicio_Acao.SelectedDate = Today();;
-    Reset(SelecDtAlvo_Acao);;
-    SelecDtAlvo_Acao.SelectedDate = Blank();;
-    // Limpeza específica para os campos que não foram resetados
-    txtRichTextDescricao_Acao.HtmlText = "";; // Ajuste para limpar o RichText
-    Reset(CboStatusAcao);;
+                    // Limpa os campos
+            Reset(CboNomeAcao);;
+            Reset(SelecDtInicio_Acao);;
+            SelecDtInicio_Acao.SelectedDate = Today();;
+            Reset(SelecDtAlvo_Acao);;
+            SelecDtAlvo_Acao.SelectedDate = Blank();;
+            // Limpeza específica para os campos que não foram resetados
+            txtRichTextDescricao_Acao.HtmlText = "";; // Ajuste para limpar o RichText
+            Reset(CboStatusAcao);;
 
-// Exibe uma notificação informando que o formulário está pronto para novo cadastro
-Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
+            // Exibe uma notificação informando que o formulário está pronto para novo cadastro
+            Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
 
         }
+
+
         btnSalvarFormPlanoAcao{
             OnSelect{
-                If(
-    IsBlank(CboNomeAcao.Selected.NomeAcao) || IsBlank(txtRichTextDescricao_Acao.HtmlText);
-    Notify("Preencha todos os campos obrigatórios antes de salvar!"; NotificationType.Error);
-    Patch(
-        tbl_cad_PlanoAcao;
-        Defaults(tbl_cad_PlanoAcao);
-        {
-            DtInicio: SelecDtInicio_Acao.SelectedDate;
-            DtAlvo: SelecDtAlvo_Acao.SelectedDate;
-            NomeAcao: {
-                '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
-                Id: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.NomeAcao).ID;
-                Value: CboNomeAcao.Selected.NomeAcao
-            };
-            NomeStatus: {
-                '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
-                Id: LookUp(tbl_cad_Status_planoacao; NomeStatus = CboStatusAcao.Selected.NomeStatus).ID;
-                Value: CboStatusAcao.Selected.NomeStatus
-            };
-            Descricao: txtRichTextDescricao_Acao.HtmlText
-        }
-    );;
-    Notify("Plano de Ação salvo com sucesso!"; NotificationType.Success)
-    
-)
+                    If(
+                        // Verifica se é um novo registro ou uma edição
+                        IsBlank(varPlanoAcaoSelecionado.ID);
+                        
+                        // Novo Registro
+                        Set(varPlanoAcaoSelecionado;
+                        Patch(
+                            tbl_cad_PlanoAcao;
+                            Defaults(tbl_cad_PlanoAcao);
+                            {
+                                DtInicio: SelecDtInicio_Acao.SelectedDate;
+                                DtAlvo: SelecDtAlvo_Acao.SelectedDate;
+                                NomeAcao: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value).ID;
+                                    Value: CboNomeAcao.Selected.Value
+                                };
+                                NomeGT: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value;NomeGT.Id);
+                                    Value: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value;NomeGT.Value)
+                                };
+                                NomeStatus: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_Status_planoacao; NomeStatus = CboStatusAcao.Selected.NomeStatus).ID;
+                                    Value: CboStatusAcao.Selected.NomeStatus
+                                };
+                                Descricao: txtRichTextDescricao_Acao.HtmlText
+                            }
+                        )
+                        );
+                        
+                        // Edição de Registro Existente
+                        Set(varPlanoAcaoSelecionado;
+                        Patch(
+                            tbl_cad_PlanoAcao;
+                            varPlanoAcaoSelecionado;
+                            {
+                                DtInicio: SelecDtInicio_Acao.SelectedDate;
+                                DtAlvo: SelecDtAlvo_Acao.SelectedDate;
+                                NomeAcao: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value).ID;
+                                    Value: CboNomeAcao.Selected.Value
+                                };
+                                NomeGT: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value;NomeGT.Id);
+                                    Value: LookUp(tbl_cad_NomeAcao; NomeAcao = CboNomeAcao.Selected.Value;NomeGT.Value)
+                                };
+                                NomeStatus: {
+                                    '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedReference";
+                                    Id: LookUp(tbl_cad_Status_planoacao; NomeStatus = CboStatusAcao.Selected.NomeStatus).ID;
+                                    Value: CboStatusAcao.Selected.NomeStatus
+                                };
+                                Descricao: txtRichTextDescricao_Acao.HtmlText
+                            }
+                        )
+                        )
+                    );;
+
+                    // Notificações para feedback ao usuário
+                    If(
+                        IsBlank(varPlanoAcaoSelecionado.ID);
+                        Notify("Novo Plano de Ação salvo com sucesso!"; NotificationType.Success);
+                        Notify("Plano de Ação atualizado com sucesso!"; NotificationType.Success)
+                    )
+
+
 
             }
         }
@@ -133,21 +180,23 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
         [txtRichTextDescricao_Acao]{
             Referente ao campo: Descricao tbl_cad_PlanoAcao
             Default{
-                Blank()
+                varPlanoAcaoSelecionado.Descricao
             }
+
+
         }
 
         [SelecDtAlvo_Acao]{
             Referente ao campo: DtAlvo tbl_cad_PlanoAcao
             DefaultDate{
-                Blank()
+                varPlanoAcaoSelecionado.DtAlvo
             }
         }
 
         [SelecDtInicio_Acao]{
             Referente ao campo: DtInicio tbl_cad_PlanoAcao
             DefaultDate{
-                Today()
+                varPlanoAcaoSelecionado.DtInicio
             }
         }
 
@@ -156,12 +205,20 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
             DisplayFields{
                 ["NomeStatus"]
             }
+
             Items{
                 tbl_cad_Status_planoacao
             }
+
             SelectMultiple{
                 false
             }
+
+            DefaultSelectedItems{
+                varPlanoAcaoSelecionado.NomeStatus
+            }
+
+
         }
 
         [CboNomeAcao]{
@@ -169,11 +226,17 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
             DisplayFields{
                 ["NomeAcao"]
             }
+
             Items{
                 tbl_cad_NomeAcao
             }
+
             SelectMultiple{
                 false
+            }
+
+            DefaultSelectedItems{
+                varPlanoAcaoSelecionado.NomeStatus
             }
         }
 
@@ -255,12 +318,27 @@ Notify("Formulário pronto para novo cadastro!"; NotificationType.Information)
                 (IsBlank(CboFiltraStatus.Selected.Value) || NomeStatus.Value = Text(CboFiltraStatus.Selected.Value))
             )
 
+
         }
 
-        Btn_CarregarDados_lstPlanosAcao{}
+        Btn_CarregarDados_lstPlanosAcao{
+            OnSelect{
+                    // Captura o item selecionado na galeria
+                    Set(varPlanoAcaoSelecionado; LstPlanosAcao.Selected);;
+
+                    // Atualiza os campos do formulário com os valores do item selecionado
+                    CboNomeAcao.Selected.Value = varPlanoAcaoSelecionado.NomeAcao.Value;;
+                    SelecDtInicio_Acao.SelectedDate = varPlanoAcaoSelecionado.DtInicio;;
+                    SelecDtAlvo_Acao.SelectedDate = varPlanoAcaoSelecionado.DtAlvo;;
+                    txtRichTextDescricao_Acao.HtmlText = varPlanoAcaoSelecionado.Descricao;;
+                    CboStatusAcao.Selected.NomeStatus = varPlanoAcaoSelecionado.NomeStatus.Value
+
+
+            }
+        }
             
 
-        }
+     }
 
     }
 
